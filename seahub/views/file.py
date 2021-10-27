@@ -140,6 +140,9 @@ from seahub.thirdparty_editor.settings import ENABLE_THIRDPARTY_EDITOR
 from seahub.thirdparty_editor.settings import THIRDPARTY_EDITOR_ACTION_URL_DICT
 from seahub.thirdparty_editor.settings import THIRDPARTY_EDITOR_ACCESS_TOKEN_EXPIRATION
 
+# cad
+from seahub.cad.settings import ENABLE_CAD
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -881,6 +884,14 @@ def view_lib_file(request, repo_id, path):
 
         send_file_access_msg(request, repo, path, 'web')
         return render(request, template, return_dict)
+    elif ENABLE_CAD and path.endswith('.dwg'):
+
+        from seahub.cad.utils import get_cad_dict
+        cad_dict = get_cad_dict(request, username, repo_id, path)
+
+        return_dict.update(cad_dict)
+
+        return render(request, 'view_file_cad.html', return_dict)
     else:
         return_dict['err'] = "File preview unsupported"
         return render(request, template, return_dict)
